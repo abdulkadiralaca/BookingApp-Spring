@@ -1,62 +1,36 @@
 package com.example.demo.services;
 
-import com.example.demo.model.Booking;
-import com.example.demo.model.Hotel;
-import com.example.demo.model.Room;
 import com.example.demo.model.User;
-import com.example.demo.repository.Repository;
+import com.example.demo.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class UserService extends Repository {
-    public User user = new User();
-
-    /*public UserService(ArrayList<User> userList, ArrayList<Room> roomList, ArrayList<Hotel> hotelList, ArrayList<Booking> bookingList) {
-        super(userList, roomList, hotelList, bookingList);
-    }*/
+public class UserService{
+    @Autowired
+    UserRepository userRepository;
 
     public List<User> getAllUsers() {
-        return userList;
-    }
-
-    public User getOneUserById(int userId) {
-        for(User u : userList){
-            if(u.id == userId){
-                return u;
-            }
-        }
-        return user;
+        return userRepository.findAll();
     }
 
     public User updateOneUser(int userId, User newUser){
-        for(int i = 0; i < userList.size(); i++){
-            if(userList.get(i).id == userId){
-                userList.set(i,newUser);
-            }
-        }
-        return newUser;
+        User userTmp = userRepository.findById(Long.valueOf(userId)).get();
+        userTmp.setFirstName(newUser.getFirstName());
+        userTmp.setPhoneNumber(newUser.getPhoneNumber());
+        userTmp.setAge(newUser.getAge());
+        userRepository.save(userTmp);
+        return userTmp;
     }
 
     public void deleteById(int userId) {
-        int id = -1;
-        for(int i = 0; i < userList.size(); i++){
-            if(userList.get(i).id == userId){
-               id = i;
-            }
-        }
-        if(id != -1) {
-            userList.remove(id);
-        }
-        else{
-            System.out.println("id not found");
-        }
+        userRepository.deleteById(Long.valueOf(userId));
     }
 
     public User saveOneUser(User newUser) {
-        userList.add(newUser);
+        userRepository.save(newUser);
         return newUser;
     }
 }

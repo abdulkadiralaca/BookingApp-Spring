@@ -22,10 +22,6 @@ public class HotelController {
         return hotelService.getAllHotels();
     }
 
-    @GetMapping("/{hotelId}")
-    public Hotel getOneHotel(@PathVariable int hotelId) {
-        return hotelService.getOneHotelById(hotelId);
-    }
 
     @PutMapping("/{hotelId}")
     public Hotel updateOneHotel(@PathVariable int hotelId, @RequestBody Hotel newHotel){

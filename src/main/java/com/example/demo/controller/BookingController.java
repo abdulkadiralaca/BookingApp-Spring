@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @RequestMapping("/bookings")
@@ -26,13 +27,8 @@ public class BookingController {
         return bookingService.createBooking(userId, roomId, duration);
     }
 
-    @GetMapping("/{bookingId}")
-    public Booking getOneBooking(@PathVariable int bookingId){
-        return bookingService.getOneBooking(bookingId);
-    }
-
     @GetMapping
-    public ArrayList<Booking> getAllBookings(){
+    public List<Booking> getAllBookings(){
         return bookingService.getAllBookings();
     }
 

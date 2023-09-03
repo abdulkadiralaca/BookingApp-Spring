@@ -1,68 +1,63 @@
 package com.example.demo.services;
 
 import com.example.demo.model.Booking;
-import com.example.demo.repository.Repository;
+import com.example.demo.model.Room;
+import com.example.demo.model.User;
+import com.example.demo.repository.BookingRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @Service
-public class BookingService extends Repository {
-    public Booking booking = new Booking();
-    RoomService roomService = new RoomService();
-    UserService userService = new UserService();
-    int id = -1;
+public class BookingService{
+    @Autowired
+    RoomService roomService;
+    @Autowired
+    UserService userService;
 
-   /* public BookingService(ArrayList<User> userList, ArrayList<Room> roomList, ArrayList<Hotel> hotelList, ArrayList<Booking> bookingList) {
-        super(userList, roomList, hotelList, bookingList);
-    }*/
+    @Autowired
+    BookingRepository bookingRepository;
+
 
     public Booking createBooking(int userId, int roomId, int duration) {
         Booking tempBooking = new Booking();
-        tempBooking.user = userService.getOneUserById(userId);
-        tempBooking.room = roomService.getOneRoomById(roomId);
-        tempBooking.id = ++id;
-        tempBooking.startDate = java.time.LocalDate.now();
+        Optional<Room> roomTmp = roomService.roomRepository.findById((long) roomId);
+        roomTmp.ifPresent(tempBooking::setRoom);
+        Optional<User> userTmp = userService.userRepository.findById((long) userId);
+        userTmp.ifPresent(tempBooking::setUser);
         Date today = new Date();
-        tempBooking.endDate = new Date(today.getTime() + (1000 * 60 * 60 * 24 * duration));
-        tempBooking.durationDay = duration;
-        tempBooking.payment = duration*tempBooking.room.price;
-        this.bookingList.add(tempBooking);
+        tempBooking.setStartDate(java.time.LocalDate.now());
+        tempBooking.setEndDate(new Date(today.getTime() + (1000 * 60 * 60 * 24 * duration)));
+        tempBooking.setDurationDay(duration);
+        tempBooking.setPayment(duration*tempBooking.room.getPrice());
+        bookingRepository.save(tempBooking);
         return tempBooking;
     }
 
-    public Booking getOneBooking(int bookingId) {
-        for(Booking b : this.bookingList){
-            if(b.id == bookingId){
-                return b;
-            }
-        }
-        return booking;
-    }
-
-    public ArrayList<Booking> getAllBookings() {
-        return this.bookingList;
+    public List<Booking> getAllBookings() {
+        return bookingRepository.findAll();
     }
 
     public Booking updateBooking(int bookingId, Booking newBooking) {
-        for(int i = 0; i < this.bookingList.size(); i++){
-            if(this.bookingList.get(i).id == bookingId){
-                this.bookingList.set(i,newBooking);
-            }
+        Booking bookingTmp = bookingRepository.findById(Long.valueOf(bookingId)).get();
+        Optional<Room> roomTmp = roomService.roomRepository.findById(newBooking.room.getId());
+        roomTmp.ifPresent(bookingTmp::setRoom);
+        Optional<User> userTmp = userService.userRepository.findById(newBooking.user.getId());
+        userTmp.ifPresent(bookingTmp::setUser);
+        if(bookingRepository.findById(Long.valueOf(bookingId)).get().getDurationDay() != newBooking.getDurationDay()){
+            bookingTmp.setDurationDay(newBooking.getDurationDay());
+            Date today = new Date();
+            bookingTmp.setEndDate(new Date(today.getTime() + (1000L * 60 * 60 * 24 * newBooking.getDurationDay())));
+            bookingTmp.setPayment(newBooking.getDurationDay()*newBooking.room.getPrice());
         }
-        return newBooking;
+        bookingRepository.save(bookingTmp);
+        return bookingTmp;
     }
 
     public void deleteBooking(int bookingId) {
-        int id=-1;
-        for(int i=0; i<this.bookingList.size(); i++){
-            if(bookingId == this.bookingList.get(i).id){
-                id = i;
-            }
-        }
-        if(id != -1){
-            this.bookingList.remove(id);
-        }
+        bookingRepository.deleteById((long) bookingId);
     }
 }

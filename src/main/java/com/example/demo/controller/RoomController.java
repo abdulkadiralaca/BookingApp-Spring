@@ -24,11 +24,6 @@ public class RoomController {
         return roomService.getAllRooms();
     }
 
-    @GetMapping("/{roomId}")
-    public Room getOneRoom(@PathVariable int roomId) {
-        return roomService.getOneRoomById(roomId);
-    }
-
     @PutMapping("/{roomId}")
     public Room updateOneRoom(@PathVariable int roomId, @RequestBody Room newRoom){
         return roomService.updateOneRoom(roomId, newRoom);

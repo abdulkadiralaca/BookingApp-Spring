@@ -20,11 +20,6 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @GetMapping("/{userId}")
-    public User getOneUser(@PathVariable int userId) {
-        return userService.getOneUserById(userId);
-    }
-
     @PutMapping("/{userId}")
     public User updateOneUser(@PathVariable int userId, @RequestBody User newUser) {
         return userService.updateOneUser(userId, newUser);

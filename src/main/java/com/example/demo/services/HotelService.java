@@ -1,61 +1,41 @@
 package com.example.demo.services;
 
-import com.example.demo.model.Booking;
 import com.example.demo.model.Hotel;
-import com.example.demo.model.Room;
 import com.example.demo.model.User;
-import com.example.demo.repository.Repository;
+import com.example.demo.repository.HotelRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class HotelService extends Repository {
-    public Hotel hotel = new Hotel();
-
-    /*public HotelService(ArrayList<User> userList, ArrayList<Room> roomList, ArrayList<Hotel> hotelList, ArrayList<Booking> bookingList) {
-        super(userList, roomList, hotelList, bookingList);
-    }*/
+public class HotelService{
+    @Autowired
+    HotelRepository hotelRepository;
 
     public List<Hotel> getAllHotels() {
-        return this.hotelList;
-    }
-
-    public Hotel getOneHotelById(int hotelId) {
-        for(Hotel h : this.hotelList){
-            if(h.id == hotelId){
-                return h;
-            }
-        }
-        return hotel;
+        return hotelRepository.findAll();
     }
 
 
     public Hotel updateOneHotel(int hotelId, Hotel newHotel) {
-        for(int i=0; i<this.hotelList.size(); i++){
-            if(hotelId == this.hotelList.get(i).id){
-                this.hotelList.set(i,newHotel);
-            }
-        }
-        return newHotel;
+        Hotel hotelTmp = hotelRepository.findById(Long.valueOf(hotelId)).get();
+        hotelTmp.setName(newHotel.getName());
+        hotelTmp.setStars(newHotel.getStars());
+        hotelTmp.setCity(newHotel.getCity());
+        hotelTmp.setRoomCapacity(newHotel.getRoomCapacity());
+        hotelRepository.save(hotelTmp);
+        return hotelTmp;
     }
 
 
     public void deleteById(int hotelId) {
-        int id=-1;
-        for(int i=0; i<this.hotelList.size(); i++){
-            if(hotelId == this.hotelList.get(i).id){
-                id = i;
-            }
-        }
-        if(id != -1){
-            this.hotelList.remove(id);
-        }
+        hotelRepository.deleteById(Long.valueOf(hotelId));
     }
 
     public Hotel saveOnehotel(Hotel newHotel) {
-        this.hotelList.add(newHotel);
+        hotelRepository.save(newHotel);
         return newHotel;
     }
 }
